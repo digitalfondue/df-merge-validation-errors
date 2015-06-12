@@ -40,7 +40,8 @@ angular.module('dfMergeValidationErrors',[]).directive('dfMergeValidationErrors'
     
       var invalidStateKeys = {};
     
-      $scope.$watch($attrs.dfValidationState, function(newVal, oldVal) {
+      $scope.$watch($attrs.dfMergeValidationErrors, function(newVal, oldVal) {
+      
       
         if(newVal === undefined || newVal === null) {
           return;

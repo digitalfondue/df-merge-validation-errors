@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+  <style>
+  .ng-invalid {
+    border:1px solid red;
+  }
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular-messages.js"></script>
+  <script src="../src/df-merge-validation-errors.js"></script>
+  <script>
+angular.module('myApp', ['ngMessages', 'dfMergeValidationErrors']).controller('TestCtrl', ['$q', TestCtrl]);
+  
+function TestCtrl($q) {
+  this.$q = $q;
+  this.arr = [0,1,2,3]
+  this.serverSideValidation = {};
+}
+
+TestCtrl.prototype.submit = function(myModel) {
+  var self = this;
+  
+  
+  //simulate http call
+  this.$q(function(resolve, reject) {
+    setTimeout(function() {
+        var hasError = false;
+        var serverSideValidation = {};
+  
+        if(myModel.val3 == null || myModel.val3 === "") {
+          serverSideValidation['myField3'] = [{type: 'missing', message: 'missing field'}];
+          hasError = true;
+        }
+  
+        if(myModel.arr == null || myModel.arr[1] == null || myModel.arr[1] === "") {
+          serverSideValidation['arr[1]'] = [{type: 'missing', message: 'missing field'}];
+          hasError = true;
+      }
+      if (hasError) {
+        resolve(serverSideValidation);
+      } else {
+        reject(serverSideValidation);
+      }
+    }, 1000);
+  }).then(function (validationSuccess) {
+        self.serverSideValidation = validationSuccess;
+    }, function(validationError) {
+        self.serverSideValidation = validationError;
+    });
+}
+
+angular.module('myApp')
+  
+  
+  
+  </script>
+</head>
+<body ng-app="myApp">
+
+<div ng-controller="TestCtrl as test">
+
+  <pre>{{test.myModel}}</pre>
+  
+  --
+  
+  <pre>{{test.serverSideValidation}}</pre>
+
+  <form name="myForm" ng-submit="test.submit(test.myModel)" df-merge-validation-errors="test.serverSideValidation">
+    <ol>
+      <li>
+        <input type="text" name="myField1" ng-model="test.myModel.val1" required>*
+        <div ng-messages="myForm.myField1.$error">
+          <div ng-message="required">You did not enter a field (client side validation)</div>
+          <div ng-repeat="validation in test.serverSideValidation['myField1']">{{validation.message}}</div>
+        </div>
+      <li>
+        <input type="text" name="myField2" ng-model="test.myModel.val2">
+        <div ng-messages="myForm.myField2.$error">
+          <div ng-repeat="validation in test.serverSideValidation['myField2']">{{validation.message}}</div>
+        </div>
+      <li>
+        <input type="text" name="myField3" ng-model="test.myModel.val3">
+        <div ng-messages="myForm.myField3.$error">
+          <div ng-repeat="validation in test.serverSideValidation['myField3']">{{validation.message}}</div>
+        </div>
+      <li ng-repeat="v in test.arr">
+        <input type="text" name="arr[{{v}}]" ng-model="test.myModel.arr[v]">
+        <div ng-messages="myForm.arr[v].$error">
+          <div ng-repeat="validation in test.serverSideValidation['arr['+v+']']">{{validation.message}}</div>
+        </div>
+    </ol>
+    <button type="submit">submit</button>
+  </form>
+</div>
+</body>
+</html>

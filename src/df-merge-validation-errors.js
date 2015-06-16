@@ -1,7 +1,7 @@
 /**
 The MIT License (MIT)
 
-Copyright (c) 2014 digitalfondue
+Copyright (c) 2015 digitalfondue
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,13 +26,15 @@ SOFTWARE.
 
 This directive merge an object with the following form 
 
-{ <fieldKey> : {type: string, message: string} | [{type: string, message}]}
+{ <fieldKey> : {type: string, message: string} | [{type: string, message}] | [string] | string}
 
 With the validation state of the form. It will watch the object recursively and
 update the $setValidity status accordingly each field.
 
 */
 angular.module('dfMergeValidationErrors',[]).directive('dfMergeValidationErrors', ['$parse', function($parse) {
+  'use strict';
+
   return {
     restrict: 'A',
     require: 'form',
@@ -54,10 +56,12 @@ angular.module('dfMergeValidationErrors',[]).directive('dfMergeValidationErrors'
               invalidStateKeys[key] = true;
               if(angular.isArray(newVal[key])) {
                 for(var i = 0; i < newVal[key].length; i++) {
-                  $form[key].$setValidity(newVal[key][i].type, false);
+                  var type = (newVal[key][i].type || newVal[key][i]).replace(/\s/g, '-');
+                  $form[key].$setValidity(type, false);
                 }
               } else {
-                $form[key].$setValidity(newVal[key].type, false);
+                var type = (newVal[key].type || newVal[key]).replace(/\s/g, '-');
+                $form[key].$setValidity(type, false);
               }
             } else if(!$form[key].$valid && invalidStateKeys[key]) {
               //cleanup now valid fields that were affected by the invalid state

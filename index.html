@@ -29,12 +29,12 @@ TestCtrl.prototype.submit = function(myModel) {
         var serverSideValidation = {};
   
         if(myModel.val3 == null || myModel.val3 === "") {
-          serverSideValidation['myField3'] = [{type: 'missing', message: 'missing field'}];
+          serverSideValidation['myField3'] = [{type: 'missing', message: 'missing field'}, {type:'another-error', message: 'yep another error'}];
           hasError = true;
         }
   
         if(myModel.arr == null || myModel.arr[1] == null || myModel.arr[1] === "") {
-          serverSideValidation['arr[1]'] = [{type: 'missing', message: 'missing field'}];
+          serverSideValidation['arr[1]'] = 'missing.field.key';
           hasError = true;
       }
       if (hasError) {
@@ -80,24 +80,32 @@ angular.module('myApp')
     <ol>
       <li>
         <input type="text" name="myField1" ng-model="test.myModel.val1" required>*
+        myForm.myField1.$error: {{myForm.myField1.$error | json}}
         <div ng-messages="myForm.myField1.$error">
           <div ng-message="required">You did not enter a field (client side validation)</div>
-          <div ng-repeat="validation in test.serverSideValidation['myField1']">{{validation.message}}</div>
+          <div ng-repeat="validation in test.serverSideValidation['myField1']" 
+            ng-message-exp="validation.type">{{validation.message}}</div>
         </div>
       <li>
         <input type="text" name="myField2" ng-model="test.myModel.val2">
+        myForm.myField2.$error: {{myForm.myField2.$error | json}}
         <div ng-messages="myForm.myField2.$error">
-          <div ng-repeat="validation in test.serverSideValidation['myField2']">{{validation.message}}</div>
+          <div ng-repeat="validation in test.serverSideValidation['myField2']" 
+            ng-message-exp="validation.type">{{validation.message}}</div>
         </div>
       <li>
         <input type="text" name="myField3" ng-model="test.myModel.val3">
-        <div ng-messages="myForm.myField3.$error">
-          <div ng-repeat="validation in test.serverSideValidation['myField3']">{{validation.message}}</div>
+        myForm.myField3.$error: {{myForm.myField3.$error | json}}
+        <div ng-messages="myForm.myField3.$error" ng-messages-multiple>
+          <div ng-repeat="validation in test.serverSideValidation['myField3']" 
+            ng-message-exp="validation.type">{{validation.message}}</div>
         </div>
       <li ng-repeat="v in test.arr">
         <input type="text" name="arr[{{v}}]" ng-model="test.myModel.arr[v]">
-        <div ng-messages="myForm.arr[v].$error">
-          <div ng-repeat="validation in test.serverSideValidation['arr['+v+']']">{{validation.message}}</div>
+        myForm['arr[{{v}}]'].$error: {{myForm['arr['+v+']'].$error | json}}
+        <div ng-messages="myForm['arr['+v+']'].$error">
+          <!-- example of a single key error -->
+          <div ng-message-exp="test.serverSideValidation['arr['+v+']']">{{test.serverSideValidation['arr['+v+']']}}</div>
         </div>
     </ol>
     <button type="submit">submit</button>

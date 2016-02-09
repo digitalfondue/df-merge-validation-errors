@@ -1,0 +1,15 @@
+{
+  "name": "df-merge-validation-errors",
+  "version": "0.1.0",
+  "description": "A small angular directive for merging validation errors (e.g.: server side validations) to a form",
+  "directories": {
+    "example": "examples"
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com:digitalfondue/df-merge-validation-errors.git"
+  },
+  "author": "digitalfondue",
+  "license": "MIT"
+}

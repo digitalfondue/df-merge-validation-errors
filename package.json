@@ -8,7 +8,7 @@
   "dependencies": {},
   "repository": {
     "type": "git",
-    "url": "git://github.com:digitalfondue/df-merge-validation-errors.git"
+    "url": "git://github.com/digitalfondue/df-merge-validation-errors.git"
   },
   "author": "digitalfondue",
   "license": "MIT"
